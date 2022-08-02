@@ -1,0 +1,13 @@
+production:
+    adapter: mysql2
+    encoding: utf8
+
+    host: exadeltask9-production.mysql.database.azure.com
+    database: exadeltask9-production
+    username: dbadmin
+    password: Pa$w0rdadmin
+
+    #host: <%= ENV['PRODUCTION_DB_HOST'] %>
+    #database: <%= ENV['PRODUCTION_DB_NAME'] %>
+    #username: <%= ENV['PRODUCTION_DB_USER'] %>
+    #password: <%= ENV['PRODUCTION_DB_PASS'] %>

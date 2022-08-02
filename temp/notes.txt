@@ -1,0 +1,7 @@
+# Application DB actions
+
+rake db:create                            # Creates the database from DATABASE_URL or config/database.yml for the current RAILS_ENV (use db:create:all to create all databases in the config). Without RAILS_ENV or when RAILS_ENV is development, it defaults to creating the development and test databases
+rake db:migrate                           # Migrate the database (options: VERSION=x, VERBOSE=false, SCOPE=blog)
+rake db:setup                             # Creates the database, loads the schema, and initializes with the seed data (use db:reset to also drop the database first)
+rake db:structure:dump                    # Dumps the database structure to db/structure.sql
+rake db:structure:load                    # Recreates the databases from the structure.sql file

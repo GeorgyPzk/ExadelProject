@@ -1,0 +1,137 @@
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- production
+- development
+
+resources:
+- repo: self
+
+variables:
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: '4cf7b510-3f3a-4406-b6d0-deed1080b839'
+
+  # imageRepository: 'app'
+  # dockerfilePath: '**/config/docker/Dockerfile'
+
+  # containerRegistry: 'exadeltaskapps.azurecr.io'
+  CONTAINER_REGISTRY: 'exadeltaskapps.azurecr.io'
+  TAG: '$(Build.BuildId)'
+
+  ENV: '$(Build.SourceBranchName)'
+
+  ENV_TAG: '$(ENV)-$(TAG)'
+
+  # exadeltaskapps.azurecr.io/app
+  IMAGE_PATH_WITHOUT_TAG: '$(CONTAINER_REGISTRY)/$(IMAGE_REPOSITORY)'
+
+  # production-ab1234567890123456789
+  ENV_VERSION: '$(ENV)-$(COMMIT_HASH)'
+
+  # exadeltaskapps.azurecr.io/app:production-ab123456
+  IMAGE_PATH_WITH_TAG_AND_VERSION: '$(IMAGE_PATH_WITHOUT_TAG):$(ENV_VERSION)'
+
+
+stages:
+
+- stage: Deploy
+  displayName: Deploy built image
+
+  condition: ne(variables['COMMIT_HASH'], '')
+
+  jobs:
+
+  - job: Deploy
+    displayName: Deploy
+
+    pool:
+      vmImage: $(vmImageName)
+
+    steps:
+
+    # - checkout: $COMMIT_HASH
+    #   condition: ne(variables['COMMIT_HASH'], '')
+
+    # - bash: exit 1
+    #   displayName: Fail build if partially successful
+    #   condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')
+
+
+    # - task: Bash@3
+    #   inputs:
+    #     targetType: 'inline'
+    #     script: |
+    #       git checkout $COMMIT_HASH
+
+
+
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo $COMMIT_HASH
+
+          git checkout $COMMIT_HASH
+
+
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: 'AKS-default'
+        namespace: 'app-$(ENV)'
+        command: 'apply'
+        useConfigurationFile: true
+        configuration: 'config/k8s/$(ENV)/ns.yaml'
+        secretType: 'dockerRegistry'
+        containerRegistryType: 'Azure Container Registry'
+
+
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: 'AKS-default'
+        namespace: 'app-$(ENV)'
+        command: 'apply'
+        useConfigurationFile: true
+        configuration: 'config/k8s/$(ENV)/memcached.yaml'
+        secretType: 'dockerRegistry'
+        containerRegistryType: 'Azure Container Registry'
+
+
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: 'AKS-default'
+        namespace: 'app-$(ENV)'
+        command: 'apply'
+        useConfigurationFile: true
+        configuration: 'config/k8s/$(ENV)/ingress.yaml'
+        secretType: 'dockerRegistry'
+        containerRegistryType: 'Azure Container Registry'
+
+
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: 'AKS-default'
+        namespace: 'app-$(ENV)'
+        command: 'apply'
+        useConfigurationFile: true
+        configuration: 'config/k8s/$(ENV)/app.yaml'
+        secretType: 'dockerRegistry'
+        containerRegistryType: 'Azure Container Registry'
+
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: 'AKS-default'
+        namespace: 'app-$(ENV)'
+        command: 'set'
+        arguments: 'image deployment/app web=$(IMAGE_PATH_WITH_TAG_AND_VERSION) worker=$(IMAGE_PATH_WITH_TAG_AND_VERSION) shredder=$(IMAGE_PATH_WITH_TAG_AND_VERSION)'
+        secretType: 'dockerRegistry'
+        containerRegistryType: 'Azure Container Registry'

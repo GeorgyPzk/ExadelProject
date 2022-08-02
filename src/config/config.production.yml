@@ -1,0 +1,42 @@
+production:
+  # Add local `production` environment configuration overrides here
+
+  # Domain settings
+  domain: "live.awsops.ml"
+
+  # Email config
+  #
+  sharetribe_mail_from_address: "musabeksadullayev@gmail.com"
+
+  # Mail delivery method
+  mail_delivery_method: smtp
+
+  # SMTP settings
+  smtp_email_domain: "live.awsops.ml"
+  smtp_email_address: "smtp.gmail.com"
+  smtp_email_port: 587
+  smtp_email_user_name: "musabeksadullayev@gmail.com"
+  smtp_email_password: "znhowrfbbthusntj"
+  #smtp_email_user_name: <%= ENV['PRODUCTION_EMAIL_USERNAME'] %>
+  #smtp_email_password: <%= ENV['PRODUCTION_EMAIL_PASSWORD'] %>
+
+  # Third party services
+
+  # AWS
+  # IAM
+  aws_access_key_id: AKIAW2UILN5N2475WSKP
+  aws_secret_access_key: 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
+  #aws_access_key_id: <%= ENV['PRODUCTION_AWS_ACCESS_KEY_ID'] %>
+  #aws_secret_access_key: <%= ENV['PRODUCTION_AWS_SECRET_ACCESS_KEY'] %>
+
+  # S3
+  active_storage_service: amazon
+
+  s3_bucket_name: exadel-tasks-9-production-project-images
+  s3_upload_bucket_name: exadel-tasks-9-production-project-images-tmp
+
+  # Google Maps API key
+  google_maps_key: AIzaSyCn1eAS5gFSJ2RBcCt1xWR5-oXZZ-hBQY8
+  #google_maps_key: <%= ENV['PRODUCTION_GOOGLE_MAPS_KEY'] %>
+
+  secret_key_base: "cda14b01f459a5b01f0f1c822b884eac9d98128d2831557cd37d927b1107d8f5c19839400281dcbb93384a2a2f32903b43da2fbcb9449f4ac120c50b7c40f466"

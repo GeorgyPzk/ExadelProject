@@ -1,0 +1,169 @@
+kind: ConfigMap 
+
+apiVersion: v1 
+
+metadata:
+  name: app-configmap
+  namespace: app-production
+
+data:
+
+  # App
+  QUEUES: "default,paperclip,mailers"
+  MAGICK_MAP_LIMIT: "64MiB"
+  MAGICK_MEMORY_LIMIT: "256MiB"
+  MAGICK_TIME_LIMIT: "30"
+
+
+---
+apiVersion: v1
+
+kind: Secret
+
+metadata:
+  name: app
+  namespace: app-production
+
+type: Opaque
+
+data:
+  secret_key_base: Y2RhMTRiMDFmNDU5YTViMDFmMGYxYzgyMmI4ODRlYWM5ZDk4MTI4ZDI4MzE1NTdjZDM3ZDkyN2IxMTA3ZDhmNWMxOTgzOTQwMDI4MWRjYmI5MzM4NGEyYTJmMzI5MDNiNDNkYTJmYmNiOTQ0OWY0YWMxMjBjNTBiN2M0MGY0NjYK
+
+
+---
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+  name: app
+  namespace: app-production
+
+  labels:
+    app: app
+
+spec:
+  replicas: 1
+  strategy: {}
+  selector:
+    matchLabels:
+      app: app
+
+  template:
+    metadata:
+      creationTimestamp: null
+
+      labels:
+        app: app
+
+    spec:
+
+      containers:
+
+      - name: web
+        image: exadeltaskapps.azurecr.io/app:stable
+        imagePullPolicy: Always
+
+        command: ["script/startup.sh"]
+
+        resources:
+          limits:
+            memory: "512Mi"
+
+        ports:
+          - containerPort: 3000
+
+        env:
+          - name: QUEUES
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: QUEUES
+
+          - name: MAGICK_MAP_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_MAP_LIMIT
+
+          - name: MAGICK_MEMORY_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_MEMORY_LIMIT
+
+          - name: MAGICK_TIME_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_TIME_LIMIT
+
+      - name: worker
+        image: exadeltaskapps.azurecr.io/app:stable
+        imagePullPolicy: Always
+
+        command: ["script/startup.sh"]
+        args: ["worker"]
+
+        resources:
+          limits:
+            memory: "512Mi"
+
+        ports:
+          - containerPort: 3000
+
+        env:
+          - name: QUEUES
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: QUEUES
+
+          - name: MAGICK_MAP_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_MAP_LIMIT
+
+          - name: MAGICK_MEMORY_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_MEMORY_LIMIT
+
+          - name: MAGICK_TIME_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_TIME_LIMIT
+
+      - name: shredder
+        image: exadeltaskapps.azurecr.io/app:stable
+        imagePullPolicy: Always
+
+        command: ["script/startup.sh"]
+        args: ["shredder"]
+
+        resources:
+          limits:
+            memory: "512Mi"
+
+---
+apiVersion: v1
+
+kind: Service
+
+metadata:
+  name: app
+  namespace: app-production
+
+  labels:
+    run: app
+
+spec:
+  type: LoadBalancer
+  selector:
+    app: app
+  ports:
+  - port: 3000
+    protocol: TCP

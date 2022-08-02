@@ -1,0 +1,13 @@
+development:
+    adapter: mysql2
+    encoding: utf8
+
+    host: exadeltask9-development.mysql.database.azure.com
+    database: exadeltask9-development
+    username: dbadmin
+    password: Pa$w0rdadmin
+
+    # host: <%= ENV['DEVELOPMENT_DB_HOST'] %>
+    # database: <%= ENV['DEVELOPMENT_DB_NAME'] %>
+    # username: <%= ENV['DEVELOPMENT_DB_USER'] %>
+    # password: <%= ENV['DEVELOPMENT_DB_PASS'] %>

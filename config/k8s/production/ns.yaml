@@ -1,0 +1,9 @@
+kind: Namespace
+
+apiVersion: v1
+
+metadata:
+  name: app-production
+
+  labels:
+    name: app-production

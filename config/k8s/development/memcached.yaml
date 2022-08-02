@@ -1,0 +1,85 @@
+kind: ConfigMap 
+
+apiVersion: v1 
+
+metadata:
+  name: memcached-configmap
+  namespace: app-development
+
+data:
+
+  MEMCACHED_USERNAME: "memcached"
+  MEMCACHED_PASSWORD: "memcached"
+
+
+---
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+  name: memcached
+  namespace: app-development
+  labels:
+    app: memcached
+
+spec:
+  replicas: 1
+  strategy: {}
+
+  selector:
+    matchLabels:
+      app: memcached
+
+  template:
+
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: memcached
+
+    spec:
+
+      containers:
+
+      - name: memcached
+        image: memcached:1.6.15-alpine3.16
+        imagePullPolicy: Always
+
+        ports:
+          - containerPort: 11211
+
+        env:
+          - name: MEMCACHED_USERNAME
+            valueFrom:
+              configMapKeyRef:
+                name: memcached-configmap
+                key: MEMCACHED_USERNAME
+
+          - name: MEMCACHED_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: memcached-configmap
+                key: MEMCACHED_PASSWORD
+
+
+---
+apiVersion: v1
+
+kind: Service
+
+metadata:
+  name: memcached
+  namespace: app-development
+  labels:
+    run: memcached
+
+spec:
+  type: LoadBalancer
+
+  selector:
+    app: memcached
+
+  ports:
+  - port: 11211
+    protocol: TCP

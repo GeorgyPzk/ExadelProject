@@ -1,0 +1,290 @@
+---
+apiVersion: v1
+
+kind: Secret
+
+metadata:
+  name: app
+
+type: Opaque
+
+data:
+  DEVELOPMENT_CONFIG_EMAIL_USERNAME: bXVzYWJla3NhZHVsbGF5ZXZAZ21haWwuY29t
+  DEVELOPMENT_CONFIG_EMAIL_PASSWORD: em5ob3dyZmJidGh1c250ag==
+  DEVELOPMENT_CONFIG_AWS_ACCESS_KEY_ID: QUtJQVcyVUlMTjVOMjQ3NVdTS1A=
+  DEVELOPMENT_CONFIG_AWS_SECRET_ACCESS_KEY: NWtINDV0NWpKUVkvU2daQU9HNytjdHZVMVZBUHVMQm81N1ZlcnJKQw==
+  DEVELOPMENT_CONFIG_GOOGLE_MAPS_KEY: QUl6YVN5Q24xZUFTNWdGU0oyUkJjQ3QxeFdSNS1vWFpaLWhCUVk4
+
+  DEVELOPMENT_DB_HOST: ZXhhZGVsdGFzazktZGV2ZWxvcG1lbnQubXlzcWwuZGF0YWJhc2UuYXp1cmUuY29t
+  DEVELOPMENT_DB_NAME: ZXhhZGVsdGFzazktZGV2ZWxvcG1lbnQ=
+  DEVELOPMENT_DB_USER: ZGJhZG1pbg==
+  DEVELOPMENT_DB_PASS: UGEkdzByZGFkbWlu
+
+
+---
+apiVersion: v1
+
+kind: ConfigMap 
+
+metadata:
+  name: app-configmap
+  namespace: app-development
+
+data:
+
+  # App
+  QUEUES: "default,paperclip,mailers"
+  MAGICK_MAP_LIMIT: "64MiB"
+  MAGICK_MEMORY_LIMIT: "256MiB"
+  MAGICK_TIME_LIMIT: "30"
+
+
+---
+apiVersion: apps/v1
+
+kind: Deployment
+
+metadata:
+  name: app
+
+  namespace: app-development
+  labels:
+    app: app
+
+spec:
+  replicas: 1
+  strategy: {}
+  selector:
+    matchLabels:
+      app: app
+
+  template:
+    metadata:
+      creationTimestamp: null
+
+      labels:
+        app: app
+
+    spec:
+
+      containers:
+
+      - name: web
+        image: exadeltaskapps.azurecr.io/app:development
+        imagePullPolicy: Always
+
+        command: ["script/startup.sh"]
+
+        resources:
+          limits:
+            memory: "512Mi"
+
+        ports:
+          - containerPort: 3000
+
+        env:
+          # Configmap
+          - name: QUEUES
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: QUEUES
+
+          - name: MAGICK_MAP_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_MAP_LIMIT
+
+          - name: MAGICK_MEMORY_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_MEMORY_LIMIT
+
+          - name: MAGICK_TIME_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_TIME_LIMIT
+
+          # Secret
+          - name: DEVELOPMENT_CONFIG_EMAIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_CONFIG_EMAIL_USERNAME
+
+          - name: DEVELOPMENT_CONFIG_EMAIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_CONFIG_EMAIL_PASSWORD
+
+          - name: DEVELOPMENT_CONFIG_AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_CONFIG_AWS_ACCESS_KEY_ID
+
+          - name: DEVELOPMENT_CONFIG_AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_CONFIG_AWS_SECRET_ACCESS_KEY
+
+          - name: DEVELOPMENT_CONFIG_GOOGLE_MAPS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_CONFIG_GOOGLE_MAPS_KEY
+
+          - name: DEVELOPMENT_DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_DB_HOST
+
+          - name: DEVELOPMENT_DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_DB_NAME
+
+          - name: DEVELOPMENT_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_DB_USER
+
+          - name: DEVELOPMENT_DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_DB_PASS
+
+
+      - name: worker
+        image: exadeltaskapps.azurecr.io/app:development
+        imagePullPolicy: Always
+
+        command: ["script/startup.sh"]
+        args: ["worker"]
+
+        resources:
+          limits:
+            memory: "512Mi"
+
+        ports:
+          - containerPort: 3000
+
+        env:
+          # Configmap
+          - name: QUEUES
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: QUEUES
+
+          - name: MAGICK_MAP_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_MAP_LIMIT
+
+          - name: MAGICK_MEMORY_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_MEMORY_LIMIT
+
+          - name: MAGICK_TIME_LIMIT
+            valueFrom:
+              configMapKeyRef:
+                name: app-configmap
+                key: MAGICK_TIME_LIMIT
+
+          # Secret
+          - name: DEVELOPMENT_CONFIG_EMAIL_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_CONFIG_EMAIL_USERNAME
+
+          - name: DEVELOPMENT_CONFIG_EMAIL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_CONFIG_EMAIL_PASSWORD
+
+          - name: DEVELOPMENT_CONFIG_AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_CONFIG_AWS_ACCESS_KEY_ID
+
+          - name: DEVELOPMENT_CONFIG_AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_CONFIG_AWS_SECRET_ACCESS_KEY
+
+          - name: DEVELOPMENT_CONFIG_GOOGLE_MAPS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_CONFIG_GOOGLE_MAPS_KEY
+
+          - name: DEVELOPMENT_DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_DB_HOST
+
+          - name: DEVELOPMENT_DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_DB_NAME
+
+          - name: DEVELOPMENT_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_DB_USER
+
+          - name: DEVELOPMENT_DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: app
+                key: DEVELOPMENT_DB_PASS
+
+      - name: shredder
+        image: exadeltaskapps.azurecr.io/app:development
+        imagePullPolicy: Always
+
+        command: ["script/startup.sh"]
+        args: ["shredder"]
+
+        resources:
+          limits:
+            memory: "512Mi"
+
+---
+apiVersion: v1
+
+kind: Service
+
+metadata:
+  name: app
+  namespace: app-development
+  labels:
+    run: app
+
+spec:
+  type: LoadBalancer
+  selector:
+    app: app
+  ports:
+  - port: 3000
+    protocol: TCP

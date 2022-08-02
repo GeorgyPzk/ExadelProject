@@ -1,0 +1,41 @@
+development:
+  # Add local `development` environment configuration overrides here
+
+  # Domain settings
+  domain: "dev.awsops.ml"
+
+  # Email config
+  #
+  sharetribe_mail_from_address: "musabeksadullayev@gmail.com"
+  # sharetribe_mail_from_address: <%= ENV['DEVELOPMENT_CONFIG_EMAIL_USERNAME'] %>
+
+  # Mail delivery method
+  mail_delivery_method: smtp
+
+  # SMTP settings
+  smtp_email_domain: "dev.awsops.ml"
+  smtp_email_address: "smtp.gmail.com"
+  smtp_email_port: 587
+  smtp_email_user_name: "musabeksadullayev@gmail.com"
+  smtp_email_password: "znhowrfbbthusntj"
+  # smtp_email_user_name: <%= ENV['DEVELOPMENT_CONFIG_EMAIL_USERNAME'] %>
+  # smtp_email_password: <%= ENV['DEVELOPMENT_CONFIG_EMAIL_PASSWORD'] %>
+
+  # Third party services
+
+  # AWS
+  # IAM
+  aws_access_key_id: AKIAW2UILN5N2475WSKP
+  aws_secret_access_key: 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
+  # aws_access_key_id: <%= ENV['DEVELOPMENT_CONFIG_AWS_ACCESS_KEY_ID'] %>
+  # aws_secret_access_key: <%= ENV['DEVELOPMENT_CONFIG_AWS_SECRET_ACCESS_KEY'] %>
+
+  # S3
+  active_storage_service: amazon
+
+  s3_bucket_name: exadel-tasks-9-development-project-images
+  s3_upload_bucket_name: exadel-tasks-9-development-project-images-tmp
+
+  # Google Maps API key
+  google_maps_key: AIzaSyCn1eAS5gFSJ2RBcCt1xWR5-oXZZ-hBQY8
+  # google_maps_key: <%= ENV['DEVELOPMENT_CONFIG_GOOGLE_MAPS_KEY'] %>
